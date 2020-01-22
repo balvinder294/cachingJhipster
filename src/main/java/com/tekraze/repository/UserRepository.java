@@ -5,6 +5,7 @@ import com.tekraze.domain.User;
 import com.datastax.driver.core.*;
 import com.datastax.driver.mapping.Mapper;
 import com.datastax.driver.mapping.MappingManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -20,6 +21,10 @@ import java.util.Set;
  */
 @Repository
 public class UserRepository {
+
+    public static final String USERS_BY_LOGIN_CACHE = "usersByLogin";
+
+    public static final String USERS_BY_EMAIL_CACHE = "usersByEmail";
 
     private final Session session;
 
@@ -145,12 +150,14 @@ public class UserRepository {
         return findOneFromIndex(stmt);
     }
 
+    @Cacheable(cacheNames = USERS_BY_EMAIL_CACHE)
     public Optional<User> findOneByEmailIgnoreCase(String email) {
         BoundStatement stmt = findOneByEmailStmt.bind();
         stmt.setString("email", email.toLowerCase());
         return findOneFromIndex(stmt);
     }
 
+    @Cacheable(cacheNames = USERS_BY_LOGIN_CACHE)
     public Optional<User> findOneByLogin(String login) {
         BoundStatement stmt = findOneByLoginStmt.bind();
         stmt.setString("login", login);

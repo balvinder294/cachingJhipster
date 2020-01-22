@@ -1,6 +1,7 @@
 package com.tekraze.service;
 
 import com.tekraze.AbstractCassandraTest;
+import com.tekraze.RedisTestContainerExtension;
 import com.tekraze.RedisIntegrationJhiApp;
 import com.tekraze.config.Constants;
 import com.tekraze.domain.User;
@@ -10,6 +11,7 @@ import com.tekraze.service.dto.UserDTO;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -22,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration tests for {@link UserService}.
  */
 @SpringBootTest(classes = RedisIntegrationJhiApp.class)
+@ExtendWith(RedisTestContainerExtension.class)
 public class UserServiceIT extends AbstractCassandraTest {
 
     private static final String DEFAULT_LOGIN = "johndoe";

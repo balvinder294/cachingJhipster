@@ -11,6 +11,7 @@ import io.github.jhipster.security.RandomUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.CacheManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -30,9 +31,12 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    private final CacheManager cacheManager;
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, CacheManager cacheManager) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.cacheManager = cacheManager;
     }
 
     public Optional<User> activateRegistration(String key) {
@@ -43,6 +47,7 @@ public class UserService {
                 user.setActivated(true);
                 user.setActivationKey(null);
                 userRepository.save(user);
+                this.clearUserCaches(user);
                 log.debug("Activated user: {}", user);
                 return user;
             });
@@ -57,6 +62,7 @@ public class UserService {
                 user.setResetKey(null);
                 user.setResetDate(null);
                 userRepository.save(user);
+                this.clearUserCaches(user);
                 return user;
             });
     }
@@ -68,6 +74,7 @@ public class UserService {
                 user.setResetKey(RandomUtil.generateResetKey());
                 user.setResetDate(Instant.now());
                 userRepository.save(user);
+                this.clearUserCaches(user);
                 return user;
             });
     }
@@ -105,6 +112,7 @@ public class UserService {
         authorities.add(AuthoritiesConstants.USER);
         newUser.setAuthorities(authorities);
         userRepository.save(newUser);
+        this.clearUserCaches(newUser);
         log.debug("Created Information for User: {}", newUser);
         return newUser;
     }
@@ -114,6 +122,7 @@ public class UserService {
              return false;
         }
         userRepository.delete(existingUser);
+        this.clearUserCaches(existingUser);
         return true;
     }
 
@@ -138,6 +147,7 @@ public class UserService {
         user.setActivated(true);
         user.setAuthorities(userDTO.getAuthorities());
         userRepository.save(user);
+        this.clearUserCaches(user);
         log.debug("Created Information for User: {}", user);
         return user;
     }
@@ -161,6 +171,7 @@ public class UserService {
                 }
                 user.setLangKey(langKey);
                 userRepository.save(user);
+                this.clearUserCaches(user);
                 log.debug("Changed Information for User: {}", user);
             });
     }
@@ -177,6 +188,7 @@ public class UserService {
             .filter(Optional::isPresent)
             .map(Optional::get)
             .map(user -> {
+                this.clearUserCaches(user);
                 user.setLogin(userDTO.getLogin().toLowerCase());
                 user.setFirstName(userDTO.getFirstName());
                 user.setLastName(userDTO.getLastName());
@@ -187,6 +199,7 @@ public class UserService {
                 user.setLangKey(userDTO.getLangKey());
                 user.setAuthorities(userDTO.getAuthorities());
                 userRepository.save(user);
+                this.clearUserCaches(user);
                 log.debug("Changed Information for User: {}", user);
                 return user;
             })
@@ -196,6 +209,7 @@ public class UserService {
     public void deleteUser(String login) {
         userRepository.findOneByLogin(login).ifPresent(user -> {
             userRepository.delete(user);
+            this.clearUserCaches(user);
             log.debug("Deleted User: {}", user);
         });
     }
@@ -211,6 +225,7 @@ public class UserService {
                 String encryptedPassword = passwordEncoder.encode(newPassword);
                 user.setPassword(encryptedPassword);
                 userRepository.save(user);
+                this.clearUserCaches(user);
                 log.debug("Changed password for User: {}", user);
             });
     }
@@ -234,4 +249,11 @@ public class UserService {
         return SecurityUtils.getCurrentUserLogin().flatMap(userRepository::findOneByLogin);
     }
 
+
+    private void clearUserCaches(User user) {
+        Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE)).evict(user.getLogin());
+        if (user.getEmail() != null) {
+            Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE)).evict(user.getEmail());
+        }
+    }
 }

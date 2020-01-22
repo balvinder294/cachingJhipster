@@ -1,6 +1,7 @@
 package com.tekraze.web.rest;
 
 import com.tekraze.AbstractCassandraTest;
+import com.tekraze.RedisTestContainerExtension;
 import com.tekraze.RedisIntegrationJhiApp;
 import com.tekraze.domain.User;
 import com.tekraze.repository.UserRepository;
@@ -14,8 +15,10 @@ import com.tekraze.web.rest.vm.ManagedUserVM;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -36,6 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Integration tests for the {@link UserResource} REST controller.
  */
 @SpringBootTest(classes = RedisIntegrationJhiApp.class)
+@ExtendWith(RedisTestContainerExtension.class)
 public class UserResourceIT extends AbstractCassandraTest {
 
     private static final String DEFAULT_LOGIN = "johndoe";
@@ -79,12 +83,17 @@ public class UserResourceIT extends AbstractCassandraTest {
     @Autowired
     private ExceptionTranslator exceptionTranslator;
 
+    @Autowired
+    private CacheManager cacheManager;
+
     private MockMvc restUserMockMvc;
 
     private User user;
 
     @BeforeEach
     public void setup() {
+        cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE).clear();
+        cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE).clear();
         UserResource userResource = new UserResource(userService, userRepository, mailService);
 
         this.restUserMockMvc = MockMvcBuilders.standaloneSetup(userResource)
@@ -252,6 +261,8 @@ public class UserResourceIT extends AbstractCassandraTest {
         // Initialize the database
         userRepository.save(user);
 
+        assertThat(cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE).get(user.getLogin())).isNull();
+
         // Get the user
         restUserMockMvc.perform(get("/api/users/{login}", user.getLogin()))
             .andExpect(status().isOk())
@@ -262,6 +273,7 @@ public class UserResourceIT extends AbstractCassandraTest {
             .andExpect(jsonPath("$.email").value(DEFAULT_EMAIL))
             .andExpect(jsonPath("$.langKey").value(DEFAULT_LANGKEY));
 
+        assertThat(cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE).get(user.getLogin())).isNotNull();
     }
 
     @Test
@@ -423,6 +435,8 @@ public class UserResourceIT extends AbstractCassandraTest {
         restUserMockMvc.perform(delete("/api/users/{login}", user.getLogin())
             .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isNoContent());
+
+        assertThat(cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE).get(user.getLogin())).isNull();
 
         // Validate the database is empty
         List<User> userList = userRepository.findAll();
