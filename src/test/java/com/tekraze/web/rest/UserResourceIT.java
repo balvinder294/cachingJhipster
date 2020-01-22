@@ -1,5 +1,6 @@
 package com.tekraze.web.rest;
 
+import com.tekraze.RedisTestContainerExtension;
 import com.tekraze.RedisIntegrationJhiApp;
 import com.tekraze.domain.Authority;
 import com.tekraze.domain.User;
@@ -14,6 +15,7 @@ import com.tekraze.web.rest.vm.ManagedUserVM;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.CacheManager;
@@ -38,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Integration tests for the {@link UserResource} REST controller.
  */
 @SpringBootTest(classes = RedisIntegrationJhiApp.class)
+@ExtendWith(RedisTestContainerExtension.class)
 public class UserResourceIT {
 
     private static final String DEFAULT_LOGIN = "johndoe";

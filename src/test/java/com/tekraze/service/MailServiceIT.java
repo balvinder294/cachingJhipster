@@ -2,11 +2,13 @@ package com.tekraze.service;
 
 import com.tekraze.config.Constants;
 
+import com.tekraze.RedisTestContainerExtension;
 import com.tekraze.RedisIntegrationJhiApp;
 import com.tekraze.domain.User;
 import io.github.jhipster.config.JHipsterProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.MockitoAnnotations;
@@ -41,6 +43,7 @@ import static org.mockito.Mockito.*;
  * Integration tests for {@link MailService}.
  */
 @SpringBootTest(classes = RedisIntegrationJhiApp.class)
+@ExtendWith(RedisTestContainerExtension.class)
 public class MailServiceIT {
 
     private static String[] languages = {

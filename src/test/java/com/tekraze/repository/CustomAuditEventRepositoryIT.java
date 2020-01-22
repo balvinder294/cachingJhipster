@@ -1,11 +1,13 @@
 package com.tekraze.repository;
 
 import com.tekraze.RedisIntegrationJhiApp;
+import com.tekraze.RedisTestContainerExtension;
 import com.tekraze.config.Constants;
 import com.tekraze.config.audit.AuditEventConverter;
 import com.tekraze.domain.PersistentAuditEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.audit.AuditEvent;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,6 +30,7 @@ import static com.tekraze.repository.CustomAuditEventRepository.EVENT_DATA_COLUM
  * Integration tests for {@link CustomAuditEventRepository}.
  */
 @SpringBootTest(classes = RedisIntegrationJhiApp.class)
+@ExtendWith(RedisTestContainerExtension.class)
 @Transactional
 public class CustomAuditEventRepositoryIT {
 

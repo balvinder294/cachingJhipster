@@ -1,6 +1,7 @@
 package com.tekraze.web.rest;
 
 import com.tekraze.RedisIntegrationJhiApp;
+import com.tekraze.RedisTestContainerExtension;
 import io.github.jhipster.config.JHipsterProperties;
 import com.tekraze.config.audit.AuditEventConverter;
 import com.tekraze.domain.PersistentAuditEvent;
@@ -9,6 +10,7 @@ import com.tekraze.repository.PersistenceAuditEventRepository;
 import com.tekraze.service.AuditEventService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,6 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Integration tests for the {@link AuditResource} REST controller.
  */
 @SpringBootTest(classes = RedisIntegrationJhiApp.class)
+@ExtendWith(RedisTestContainerExtension.class)
 @Transactional
 public class AuditResourceIT {
 

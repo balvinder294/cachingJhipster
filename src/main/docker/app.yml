@@ -7,6 +7,7 @@ services:
       - SPRING_PROFILES_ACTIVE=prod,swagger
       - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED=true
       - SPRING_DATASOURCE_URL=jdbc:mariadb://redisintegrationjhi-mariadb:3306/redisintegrationjhi
+      - JHIPSTER_CACHE_REDIS_SERVER=redis://redisintegrationjhi-redis:6379
       - JHIPSTER_SLEEP=120 # gives time for mariadb server to start
     ports:
       - 8080:8080
@@ -14,3 +15,7 @@ services:
     extends:
       file: mariadb.yml
       service: redisintegrationjhi-mariadb
+  redisintegrationjhi-redis:
+    extends:
+      file: redis.yml
+      service: redisintegrationjhi-redis

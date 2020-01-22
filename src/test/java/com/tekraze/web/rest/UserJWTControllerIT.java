@@ -1,5 +1,6 @@
 package com.tekraze.web.rest;
 
+import com.tekraze.RedisTestContainerExtension;
 import com.tekraze.RedisIntegrationJhiApp;
 import com.tekraze.domain.User;
 import com.tekraze.repository.UserRepository;
@@ -8,6 +9,7 @@ import com.tekraze.web.rest.errors.ExceptionTranslator;
 import com.tekraze.web.rest.vm.LoginVM;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -28,6 +30,7 @@ import static org.hamcrest.Matchers.not;
  * Integration tests for the {@link UserJWTController} REST controller.
  */
 @SpringBootTest(classes = RedisIntegrationJhiApp.class)
+@ExtendWith(RedisTestContainerExtension.class)
 public class UserJWTControllerIT {
 
     @Autowired
