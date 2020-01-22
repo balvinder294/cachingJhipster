@@ -29,36 +29,18 @@ spring:
   devtools:
     restart:
       enabled: true
-      additional-exclude: static/**,.h2.server.properties
+      additional-exclude: static/**
     livereload:
       enabled: false # we use Webpack dev server + BrowserSync for livereload
   jackson:
     serialization:
       indent-output: true
-  datasource:
-    type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:h2:file:./target/h2db/db/redisintegrationjhi;DB_CLOSE_DELAY=-1
-    username: redisIntegrationJhi
-    password:
-    hikari:
-      poolName: Hikari
-      auto-commit: false
-  h2:
-    console:
-      enabled: false
-  jpa:
-    database-platform: io.github.jhipster.domain.util.FixedH2Dialect
-    database: H2
-    show-sql: true
-    properties:
-      hibernate.id.new_generator_mappings: true
-      hibernate.connection.provider_disables_autocommit: true
-      hibernate.cache.use_second_level_cache: false
-      hibernate.cache.use_query_cache: false
-      hibernate.generate_statistics: false
-  liquibase:
-    # Remove 'faker' if you do not want the sample data to be loaded automatically
-    contexts: dev, faker
+  data:
+    cassandra:
+      contactPoints: localhost
+      protocolVersion: V4
+      compression: LZ4
+      keyspaceName: redisIntegrationJhi
   mail:
     host: localhost
     port: 25
@@ -79,9 +61,6 @@ server:
 # ===================================================================
 
 jhipster:
-  cache: # Cache configuration
-    redis: # Redis configuration
-      expiration: 3600 # By default objects stay 1 hour (in seconds) in the cache
   # CORS is only enabled by default with the "dev" profile, so BrowserSync can access the API
   cors:
     allowed-origins: '*'
@@ -94,7 +73,7 @@ jhipster:
     authentication:
       jwt:
         # This token must be encoded using Base64 and be at least 256 bits long (you can type `openssl rand -base64 64` on your command line to generate a 512 bits one)
-        base64-secret: MjJmMWI4M2U0NDQwYWY4N2I3NzFiOGI0Y2NiZDZmNDQ5MWQ5ZmNiNTQ1NTNkZWQzZmVjNzcwNjhjMTk5M2UxZGE2ZGU3MjRmZjczZTI5YzhkMWQ2Yzg1NTllOTJiMGUwNjZmMThlY2RlMDUzMGIxYjk2NzVjZGMwMzg0MjkwZTQ=
+        base64-secret: MGNjNWZlY2MxMTE1MjMxMzZkMTkwNTliMWYyZWE2NTAzNjliMWE3YWQ0ZmQ2YjExNzJkZmVkZDU2YzQ4OTMyMDI4ZDU4ZTQyMDY5MGJjNTMyMDczYzIzNTE0N2ZhYzNmNjA3MmZhYmY4OTFiMTMzODU2NDhmYWFiODgwMGIxNzI=
         # Token is valid 24 hours
         token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 2592000
@@ -111,9 +90,6 @@ jhipster:
       host: localhost
       port: 5000
       queue-size: 512
-  audit-events:
-    retention-period: 30 # Number of days before audit events are deleted.
-
 # ===================================================================
 # Application specific properties
 # Add your own application properties here, see the ApplicationProperties class

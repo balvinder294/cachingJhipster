@@ -1,6 +1,5 @@
 package com.tekraze.service.mapper;
 
-import com.tekraze.domain.Authority;
 import com.tekraze.domain.User;
 import com.tekraze.service.dto.UserDTO;
 
@@ -46,31 +45,28 @@ public class UserMapper {
             user.setFirstName(userDTO.getFirstName());
             user.setLastName(userDTO.getLastName());
             user.setEmail(userDTO.getEmail());
-            user.setImageUrl(userDTO.getImageUrl());
             user.setActivated(userDTO.isActivated());
             user.setLangKey(userDTO.getLangKey());
-            Set<Authority> authorities = this.authoritiesFromStrings(userDTO.getAuthorities());
+            Set<String> authorities = this.cleanNullStringAuthorities(userDTO.getAuthorities());
             user.setAuthorities(authorities);
             return user;
         }
     }
 
 
-    private Set<Authority> authoritiesFromStrings(Set<String> authoritiesAsString) {
-        Set<Authority> authorities = new HashSet<>();
+    private Set<String> cleanNullStringAuthorities(Set<String> authoritiesAsString) {
+        Set<String> authorities = new HashSet<>();
 
-        if(authoritiesAsString != null){
-            authorities = authoritiesAsString.stream().map(string -> {
-                Authority auth = new Authority();
-                auth.setName(string);
-                return auth;
-            }).collect(Collectors.toSet());
+        if(authoritiesAsString != null) {
+            authorities = authoritiesAsString.stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
         }
 
         return authorities;
     }
 
-    public User userFromId(Long id) {
+    public User userFromId(String id) {
         if (id == null) {
             return null;
         }

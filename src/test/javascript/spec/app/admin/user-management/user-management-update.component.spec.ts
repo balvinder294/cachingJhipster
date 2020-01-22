@@ -62,7 +62,7 @@ describe('Component Tests', () => {
         [],
         fakeAsync(() => {
           // GIVEN
-          const entity = new User(123);
+          const entity = new User('9fec3727-3421-4967-b213-ba36557ca194');
           spyOn(service, 'update').and.returnValue(
             of(
               new HttpResponse({

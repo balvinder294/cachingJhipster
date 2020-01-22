@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class UserMapperTest {
 
     private static final String DEFAULT_LOGIN = "johndoe";
-    private static final Long DEFAULT_ID = 1L;
+    private static final String DEFAULT_ID = "id1";
 
     private UserMapper userMapper;
     private User user;
@@ -35,7 +35,6 @@ public class UserMapperTest {
         user.setEmail("johndoe@localhost");
         user.setFirstName("john");
         user.setLastName("doe");
-        user.setImageUrl("image_url");
         user.setLangKey("en");
 
         userDto = new UserDTO(user);
@@ -80,7 +79,7 @@ public class UserMapperTest {
         assertThat(users).size().isEqualTo(1);
         assertThat(users.get(0).getAuthorities()).isNotNull();
         assertThat(users.get(0).getAuthorities()).isNotEmpty();
-        assertThat(users.get(0).getAuthorities().iterator().next().getName()).isEqualTo("ADMIN");
+        assertThat(users.get(0).getAuthorities().iterator().next()).isEqualTo("ADMIN");
     }
 
     @Test
@@ -109,7 +108,7 @@ public class UserMapperTest {
         assertThat(user).isNotNull();
         assertThat(user.getAuthorities()).isNotNull();
         assertThat(user.getAuthorities()).isNotEmpty();
-        assertThat(user.getAuthorities().iterator().next().getName()).isEqualTo("ADMIN");
+        assertThat(user.getAuthorities().iterator().next()).isEqualTo("ADMIN");
     }
 
     @Test

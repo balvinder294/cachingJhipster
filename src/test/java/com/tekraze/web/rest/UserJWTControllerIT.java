@@ -1,6 +1,6 @@
 package com.tekraze.web.rest;
 
-import com.tekraze.RedisTestContainerExtension;
+import com.tekraze.AbstractCassandraTest;
 import com.tekraze.RedisIntegrationJhiApp;
 import com.tekraze.domain.User;
 import com.tekraze.repository.UserRepository;
@@ -9,14 +9,14 @@ import com.tekraze.web.rest.errors.ExceptionTranslator;
 import com.tekraze.web.rest.vm.LoginVM;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -30,8 +30,7 @@ import static org.hamcrest.Matchers.not;
  * Integration tests for the {@link UserJWTController} REST controller.
  */
 @SpringBootTest(classes = RedisIntegrationJhiApp.class)
-@ExtendWith(RedisTestContainerExtension.class)
-public class UserJWTControllerIT {
+public class UserJWTControllerIT extends AbstractCassandraTest {
 
     @Autowired
     private TokenProvider tokenProvider;
@@ -59,15 +58,15 @@ public class UserJWTControllerIT {
     }
 
     @Test
-    @Transactional
     public void testAuthorize() throws Exception {
         User user = new User();
+        user.setId(UUID.randomUUID().toString());
         user.setLogin("user-jwt-controller");
         user.setEmail("user-jwt-controller@example.com");
         user.setActivated(true);
         user.setPassword(passwordEncoder.encode("test"));
 
-        userRepository.saveAndFlush(user);
+        userRepository.save(user);
 
         LoginVM login = new LoginVM();
         login.setUsername("user-jwt-controller");
@@ -83,15 +82,15 @@ public class UserJWTControllerIT {
     }
 
     @Test
-    @Transactional
     public void testAuthorizeWithRememberMe() throws Exception {
         User user = new User();
+        user.setId(UUID.randomUUID().toString());
         user.setLogin("user-jwt-controller-remember-me");
         user.setEmail("user-jwt-controller-remember-me@example.com");
         user.setActivated(true);
         user.setPassword(passwordEncoder.encode("test"));
 
-        userRepository.saveAndFlush(user);
+        userRepository.save(user);
 
         LoginVM login = new LoginVM();
         login.setUsername("user-jwt-controller-remember-me");

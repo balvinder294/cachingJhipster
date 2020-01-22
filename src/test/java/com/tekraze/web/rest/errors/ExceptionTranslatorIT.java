@@ -1,10 +1,9 @@
 package com.tekraze.web.rest.errors;
 
-import com.tekraze.RedisTestContainerExtension;
+import com.tekraze.AbstractCassandraTest;
 import com.tekraze.RedisIntegrationJhiApp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -22,8 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Integration tests {@link ExceptionTranslator} controller advice.
  */
 @SpringBootTest(classes = RedisIntegrationJhiApp.class)
-@ExtendWith(RedisTestContainerExtension.class)
-public class ExceptionTranslatorIT {
+public class ExceptionTranslatorIT extends AbstractCassandraTest {
 
     @Autowired
     private ExceptionTranslatorTestController controller;
@@ -42,14 +40,6 @@ public class ExceptionTranslatorIT {
             .setControllerAdvice(exceptionTranslator)
             .setMessageConverters(jacksonMessageConverter)
             .build();
-    }
-
-    @Test
-    public void testConcurrencyFailure() throws Exception {
-        mockMvc.perform(get("/test/concurrency-failure"))
-            .andExpect(status().isConflict())
-            .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
-            .andExpect(jsonPath("$.message").value(ErrorConstants.ERR_CONCURRENCY_FAILURE));
     }
 
     @Test
